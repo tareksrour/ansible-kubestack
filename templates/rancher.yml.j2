@@ -12,5 +12,5 @@ spec:
     hostname: {{ stack_rancher.hostname }}
     bootstrapPassword: {{ stack_rancher.bootstrapPassword }}
     replicas: {{ stack_rancher.replicas }}
-    ingressClassName: {{ stack_nginx_controllers.0.ingressClass }}
+    ingressClassName: {{ stack_rancher.ingressClass }}
 ---

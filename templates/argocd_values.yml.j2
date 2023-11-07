@@ -1,7 +1,7 @@
 server:
   ingress:
     enabled: true
-    ingressClassName: "{{ stack_nginx_controllers.0.ingressClass }}"
+    ingressClassName: "{{ stack_argocd.ingressClass }}"
     hosts: 
 {% for host in stack_argocd.hosts %}
     - {{ host }}
@@ -9,7 +9,7 @@ server:
     annotations:
         nginx.ingress.kubernetes.io/ssl-passthrough: "true"
         nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-{% if stack_vault.enabled %}
+{% if stack_argocd.vault_addr is defined and  stack_argocd.vault_token is defined %}
 repoServer:
   rbac:
     - verbs:

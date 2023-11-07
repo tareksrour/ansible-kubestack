@@ -140,7 +140,7 @@
       kind: Namespace
       metadata:
         name: "{{ stack_argocd.namespace }}"
-  when: stack_argocd.enabled and stack_vault.enabled
+  when: stack_argocd.enabled and stack_argocd.vault_addr is defined and  stack_argocd.vault_token is defined
 - name: Create Argocd-Vault Secret
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig }}"
@@ -157,12 +157,12 @@
         AVP_TYPE: dmF1bHQ=
         AVP_AUTH_TYPE: dG9rZW4=
       type: Opaque
-  when: stack_argocd.enabled and stack_vault.enabled
+  when: stack_argocd.enabled and stack_argocd.vault_addr is defined and  stack_argocd.vault_token is defined
 - name: Create Argocd-Vault Config
   kubernetes.core.k8s:
     state: present
     template: 'templates/cmp-plugin.yml.j2'
-  when: stack_argocd.enabled and stack_vault.enabled
+  when: stack_argocd.enabled and stack_argocd.vault_addr is defined and  stack_argocd.vault_token is defined
 - name: Deploy ArgoCD
   kubernetes.core.helm:
     wait: true

@@ -49,6 +49,7 @@ stack_rancher:
   replicas: 1
   namespace: cattle-system
   enabled: true
+  ingressClass: nginx
 stack_longhorn:
   enabled: true
   replicas: 2
@@ -66,6 +67,7 @@ stack_argocd:
   - argocd.example.com
   vault_addr: http://vault.example.com:8200
   vault_token: hvs.token
+  ingressClass: nginx
 stack_vault:
   enabled: true
   namespace: vault
@@ -114,6 +116,7 @@ Example playbook to install everything except vault (its already integrated into
           replicas: 1
           namespace: cattle-system
           enabled: true
+          ingressClass: nginx
         stack_argocd:
           enabled: true
           namespace: argocd
@@ -121,6 +124,7 @@ Example playbook to install everything except vault (its already integrated into
           - argocd.example.com
           vault_addr: http://vault.example.com:8200
           vault_token: hvs.token
+          ingressClass: nginx
         stack_vault:
           enabled: false
       roles:
