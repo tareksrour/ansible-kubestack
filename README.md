@@ -1,28 +1,90 @@
-Role Name
+KubeStack
 =========
 
-A brief description of the role goes here.
+This ansible role can install basic components for kubernetes cluster:
+  - MetalLB
+  - CertManager
+  - Nginx Ingress Controller
+  - Longhorn CSI
+  - Loki
+  - Rancher Manager
+  - Vault
 
 Requirements
 ------------
+This role requires the following:
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+  - [kubernetes](https://pypi.org/project/kubernetes/)
+  - [helm](https://github.com/helm/helm/releases)
+  - [yaml](https://pypi.org/project/PyYAML/)
+  - python >= 3.6
+  - jsonpatch
+
+
 
 Role Variables
 --------------
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
+```yaml
+stack_metallb:
+  pools: 
+  - 127.0.0.1-127.0.0.1
+  enabled: true
+  namespace: metallb-system
+stack_cert_manager:
+  version: v1.13.2
+  namespace: cert-manager
+  enabled: true
+stack_nginx_controllers:
+  - version: 4.8.3
+    ingress_class_by_name: true
+    ssl_passthrough: true
+    service_type: LoadBalancer
+    loadBalancerIP: 127.0.0.1
+    ingressClass: nginx
+    namespace: ingress-nginx
+stack_rancher: 
+  hostname: rancher.example.com
+  bootstrapPassword: admin
+  replicas: 1
+  namespace: cattle-system
+  enabled: true
+stack_longhorn:
+  enabled: true
+  replicas: 2
+  ui: Rancher-Proxy
+  namespace: longhorn-system
+stack_loki:
+  enabled: true
+  namespace: loki
+  persistence_enabled: true
+  persistence_size: 10Gi
+stack_argocd:
+  enabled: true
+  namespace: argocd
+  hosts:
+  - argocd.example.com
+  vault_addr: http://vault.example.com:8200
+  vault_token: hvs.token
+stack_vault:
+  enabled: true
+  namespace: vault
+  externalVaultAddr: http://vault.example.com:8200
+use_manifests: true
+manifests_path: /var/lib/rancher/rke2/server/manifests
+kubeconfig: ~/.kube/config
+```
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+This role depends only on:
+  - [kubernetes.core](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/index.html)
+
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
+Example playbook to install everything except vault (its already integrated into argocd):
+```yaml
     - hosts: localhost
       vars:
         manifests_path: /tmp
@@ -62,13 +124,28 @@ Including an example of how to use your role (for instance, with variables passe
           enabled: false
       roles:
         - role: kube-stack
+```
 
 License
 -------
+MIT License
 
-BSD
+Copyright (c) 2023 Tarek Srour
 
-Author Information
-------------------
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
