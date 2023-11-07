@@ -1,0 +1,8 @@
+name: kubestack
+namespace: tareksrour
+authors:
+  - tareksrour
+readme: README.md
+version: 0.0.2
+license_file: LICENSE
+repository: https://gitlab.com/teeco-DevOps/ansible/kubestack.git

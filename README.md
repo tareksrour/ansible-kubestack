@@ -2,6 +2,7 @@ KubeStack
 =========
 
 This ansible role can install basic components for kubernetes cluster:
+
   - MetalLB
   - CertManager
   - Nginx Ingress Controller
