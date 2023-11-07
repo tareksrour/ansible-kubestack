@@ -1,0 +1,11 @@
+
+- name: Install kubernetes python package
+  ansible.builtin.pip:
+    name: kubernetes
+- name: Include test
+  ansible.builtin.include_tasks: "manifests.yml"
+  when: use_manifests
+- name: Include test2
+  ansible.builtin.include_tasks: "helm.yml"
+  when: not use_manifests
+# tasks file for kube-stack

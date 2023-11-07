@@ -1,0 +1,194 @@
+- name: Add metallb repository
+  kubernetes.core.helm_repository:
+    name: metallb
+    repo_url: https://metallb.github.io/metallb
+  when: stack_metallb.enabled
+- name: Deploy metallb
+  kubernetes.core.helm:
+    wait: true
+    name: metallb
+    chart_ref: metallb/metallb
+    release_namespace: "{{ stack_metallb.namespace }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig }}"
+  when: stack_metallb.enabled
+- name: Apply Metallb Pool
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig }}"
+    state: present
+    definition: "{{ lookup('template', 'metallb_pool.yml.j2') | from_yaml }}"
+  when: stack_metallb.enabled
+- name: Apply Metallb Advertise
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig }}"
+    state: present
+    definition: "{{ lookup('template', 'metallb_advertise.yml.j2') | from_yaml }}"
+  when: stack_metallb.enabled
+
+- name: Add cert-manager repository
+  kubernetes.core.helm_repository:
+    name: jetstack
+    repo_url: https://charts.jetstack.io
+  when: stack_cert_manager.enabled
+- name: Deploy cert-manager
+  kubernetes.core.helm:
+    wait: true
+    name: cert-manager
+    chart_ref: jetstack/cert-manager
+    release_namespace: "{{ stack_cert_manager.namespace }}"
+    chart_version: "{{ stack_cert_manager.version }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig }}"
+    values: 
+      installCRDs: true
+  when: stack_cert_manager.enabled
+
+
+
+- name: Add ingress-nginx repository
+  kubernetes.core.helm_repository:
+    name: ingress-nginx
+    repo_url: https://kubernetes.github.io/ingress-nginx
+  when: stack_nginx_controllers is defined and (stack_nginx_controllers|length >0 )
+- name: Deploy ingress-nginx
+  kubernetes.core.helm:
+    wait: true
+    name: ingress-{{ item.ingressClass }}
+    chart_ref: ingress-nginx/ingress-nginx
+    release_namespace: "{{ item.namespace }}"
+    chart_version: "{{ item.version }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig }}"
+    values: "{{ lookup('template', 'ingress_nginx_values.yml.j2') | from_yaml }}"
+  with_items: "{{ stack_nginx_controllers }}"
+  when: stack_nginx_controllers is defined and (stack_nginx_controllers|length >0 )
+
+- name: Add rancher repository
+  kubernetes.core.helm_repository:
+    name: rancher-stable
+    repo_url: https://releases.rancher.com/server-charts/stable
+  when: stack_rancher.enabled
+- name: Deploy rancher
+  kubernetes.core.helm:
+    wait: true
+    name: rancher
+    chart_ref: rancher-stable/rancher
+    release_namespace: "{{ stack_rancher.namespace }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig }}"
+    values: 
+      hostname: "{{ stack_rancher.hostname }}"
+      bootstrapPassword: "{{ stack_rancher.bootstrapPassword }}"
+      replicas: "{{ stack_rancher.replicas }}"
+  when: stack_rancher.enabled
+
+- name: Add Longhorn repository
+  kubernetes.core.helm_repository:
+    name: longhorn
+    repo_url: https://charts.longhorn.io
+  when: stack_longhorn.enabled
+- name: Deploy longhorn
+  kubernetes.core.helm:
+    wait: true
+    name: longhorn
+    chart_ref: longhorn/longhorn
+    release_namespace: "{{ stack_longhorn.namespace }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig }}"
+    values:
+      longhornUI:
+        replicas: 1
+      persistence:
+        defaultClassReplicaCount: "{{ stack_longhorn.replicas }}"
+      service:
+        ui:
+          type: "{{ stack_longhorn.ui }}"
+  when: stack_longhorn.enabled
+
+- name: Add Loki repository
+  kubernetes.core.helm_repository:
+    name: grafana
+    repo_url: https://grafana.github.io/helm-charts
+  when: stack_loki.enabled
+- name: Deploy Loki
+  kubernetes.core.helm:
+    wait: true
+    name: loki-stack
+    chart_ref: grafana/loki-stack
+    release_namespace: "{{ stack_loki.namespace }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig }}"
+    values: 
+      loki:
+        persistence:
+          enabled: "{{ stack_loki.persistence_enabled if stack_loki.persistence_enabled is defined else false }}"
+          size: "{{ stack_loki.persistence_size if stack_loki.persistence_size is defined else '10Gi' }}"
+          storageClass: longhorn
+  when: stack_loki.enabled
+
+- name: Add ArgoCD repository
+  kubernetes.core.helm_repository:
+    name: argo
+    repo_url: https://argoproj.github.io/argo-helm
+  when: stack_argocd.enabled
+- name: Create Argocd Namespace
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ stack_argocd.namespace }}"
+  when: stack_argocd.enabled and stack_vault.enabled
+- name: Create Argocd-Vault Secret
+  kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig }}"
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: vault-configuration
+        namespace: "{{ stack_argocd.namespace }}"
+      data:
+        VAULT_ADDR: "{{ stack_argocd.vault_addr | b64encode }}"
+        VAULT_TOKEN: "{{ stack_argocd.vault_token | b64encode }}"
+        AVP_TYPE: dmF1bHQ=
+        AVP_AUTH_TYPE: dG9rZW4=
+      type: Opaque
+  when: stack_argocd.enabled and stack_vault.enabled
+- name: Create Argocd-Vault Config
+  kubernetes.core.k8s:
+    state: present
+    template: 'templates/cmp-plugin.yml.j2'
+  when: stack_argocd.enabled and stack_vault.enabled
+- name: Deploy ArgoCD
+  kubernetes.core.helm:
+    wait: true
+    name: argocd
+    chart_ref: argo/argo-cd
+    release_namespace: "{{ stack_argocd.namespace }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig }}"
+    values:  "{{ lookup('template', 'argocd_values.yml.j2') | from_yaml }}"
+  when: stack_argocd.enabled
+# - name: Add Hashicorp repository
+#   kubernetes.core.helm_repository:
+#     name: hashicorp
+#     repo_url: https://helm.releases.hashicorp.com
+#   when: stack_vault.enabled
+# - name: Deploy Vault
+#   kubernetes.core.helm:
+#     wait: true
+#     name: vault
+#     chart_ref: hashicorp/vault
+#     release_namespace: "{{ stack_vault.namespace }}"
+#     create_namespace: true
+#     kubeconfig: "{{ kubeconfig }}"
+#     values:
+#       global:
+#         externalVaultAddr: "{{ stack_vault.externalVaultAddr if stack_vault.externalVaultAddr else '' }}"
+#     environment:
+#       https_proxy: http://qadevops.internal.sirenanalytics.com:3128
+#   when: stack_vault.enabled

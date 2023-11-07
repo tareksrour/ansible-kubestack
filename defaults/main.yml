@@ -1,0 +1,47 @@
+stack_metallb:
+  pools: 
+  - 127.0.0.1-127.0.0.1
+  enabled: true
+  namespace: metallb-system
+stack_cert_manager:
+  version: v1.13.2
+  namespace: cert-manager
+  enabled: true
+stack_nginx_controllers:
+  - version: 4.8.3
+    ingress_class_by_name: true
+    ssl_passthrough: true
+    service_type: LoadBalancer
+    loadBalancerIP: 127.0.0.1
+    ingressClass: nginx
+    namespace: ingress-nginx
+stack_rancher: 
+  hostname: rancher.example.com
+  bootstrapPassword: admin
+  replicas: 1
+  namespace: cattle-system
+  enabled: true
+stack_longhorn:
+  enabled: true
+  replicas: 2
+  ui: Rancher-Proxy
+  namespace: longhorn-system
+stack_loki:
+  enabled: true
+  namespace: loki
+  persistence_enabled: true
+  persistence_size: 10Gi
+stack_argocd:
+  enabled: true
+  namespace: argocd
+  hosts:
+  - argocd.example.com
+  vault_addr: http://vault.example.com:8200
+  vault_token: hvs.token
+stack_vault:
+  enabled: true
+  namespace: vault
+  externalVaultAddr: http://vault.example.com:8200
+use_manifests: true
+manifests_path: /var/lib/rancher/rke2/server/manifests
+kubeconfig: ~/.kube/config

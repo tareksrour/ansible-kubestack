@@ -1,0 +1,14 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: longhorn
+spec:
+  targetNamespace: {{ stack_longhorn.namespace }}
+  createNamespace: true
+  chart: longhorn
+  repo: https://charts.longhorn.io
+  set:
+    persistence.defaultClassReplicaCount: {{ stack_longhorn.replicas }}
+    service.ui.type: {{ stack_longhorn.ui }}
+---

@@ -1,0 +1,12 @@
+controller:
+  service:
+    type: {{ item.service_type }}
+    loadBalancerIP: {{ item.loadBalancerIP }}
+  ingressClass: {{ item.ingressClass }}
+  ingressClassResource:
+    name: {{ item.ingressClass }}
+  ingressClassByName: {{ item.ingress_class_by_name if item.ingress_class_by_name is not none else true }}
+{% if item.ssl_passthrough %}
+  extraArgs:
+    enable-ssl-passthrough: ""
+{% endif %}

@@ -1,0 +1,17 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: loki
+spec:
+  targetNamespace: {{ stack_loki.namespace }}
+  createNamespace: true
+  chart: loki-stack
+  repo: https://grafana.github.io/helm-charts
+{% if stack_loki.persistence_enabled %}
+  set:
+    loki.persistence.enabled: true
+    {% if stack_loki.persistence_size is defined %}loki.persistence.size: {{ stack_loki.persistence_size }}{% endif %}
+{% endif %}
+
+---

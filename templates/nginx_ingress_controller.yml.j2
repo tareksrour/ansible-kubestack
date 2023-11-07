@@ -1,0 +1,22 @@
+{% for controller in stack_nginx_controllers %}
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: {{ controller.ingressClass }}
+spec:
+  targetNamespace: {{ controller.namespace }}
+  createNamespace: true
+  chart: ingress-nginx
+  repo: https://kubernetes.github.io/ingress-nginx
+  set:
+    controller.service.type: {{ controller.service_type }}
+    controller.ingressClass: {{ controller.ingressClass }}
+    controller.ingressClassResource.name: {{ controller.ingressClass }}
+    controller.service.loadBalancerIP: {{ controller.loadBalancerIP }}
+    controller.ingressClassByName: {{ controller.ingress_class_by_name if controller.ingress_class_by_name is not none else true }}
+{% if controller.ssl_passthrough %}
+    controller.extraArgs.enable-ssl-passthrough: ""
+{% endif %}
+---
+{% endfor %}

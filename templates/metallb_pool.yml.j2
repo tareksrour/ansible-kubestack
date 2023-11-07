@@ -1,0 +1,10 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  namespace: {{ stack_metallb.namespace }}
+  name: first-pool
+spec:
+  addresses:
+{% for range in stack_metallb.pools %}
+  - {{ range }}
+{%- endfor %}

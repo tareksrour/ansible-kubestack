@@ -1,0 +1,13 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  namespace: kube-system
+  name: cert-manager
+spec:
+  targetNamespace: {{ stack_cert_manager.namespace }}
+  createNamespace: true
+  chart: cert-manager
+  repo: https://charts.jetstack.io
+  set:
+    installCRDs: true
+---

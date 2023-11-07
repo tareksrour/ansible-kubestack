@@ -1,0 +1,72 @@
+- name: Copy Metallb Helm
+  ansible.builtin.template:
+    src: "templates/metallb.yml.j2"
+    dest: "{{ manifests_path }}/metallb.yml"
+    owner: root
+    group: root
+    mode: 0660
+  become: true
+  when: stack_metallb.enabled
+- name: Copy Metallb Pool
+  ansible.builtin.template:
+    src: "templates/metallb_pool.yml.j2"
+    dest: "{{ manifests_path }}/metallb_pool.yml"
+    owner: root
+    group: root
+    mode: 0660
+  become: true
+  when: stack_metallb.enabled
+- name: Copy Metallb Config
+  ansible.builtin.template:
+    src: "templates/metallb_advertise.yml.j2"
+    dest: "{{ manifests_path }}/metallb_advertise.yml"
+    owner: root
+    group: root
+    mode: 0660
+  become: true
+  when: stack_metallb.enabled
+- name: Copy certmanager Helm
+  ansible.builtin.template:
+    src: "templates/cert_manager.yml.j2"
+    dest: "{{ manifests_path }}/cert_manager.yml"
+    owner: root
+    group: root
+    mode: 0660
+  become: true
+  when: stack_cert_manager.enabled
+- name: Copy nginx Helm
+  ansible.builtin.template:
+    src: "templates/nginx_ingress_controller.yml.j2"
+    dest: "{{ manifests_path }}/nginx_ingress_controller.yml"
+    owner: root
+    group: root
+    mode: 0660
+  become: true
+  when: stack_nginx_controllers is defined and (stack_nginx_controllers|length >0 )
+- name: Copy rancher Helm
+  ansible.builtin.template:
+    src: "templates/rancher.yml.j2"
+    dest: "{{ manifests_path }}/rancher.yml"
+    owner: root
+    group: root
+    mode: 0660
+  become: true
+  when: stack_rancher.enabled
+- name: Copy longhorn Helm
+  ansible.builtin.template:
+    src: "templates/longhorn.yml.j2"
+    dest: "{{ manifests_path }}/longhorn.yml"
+    owner: root
+    group: root
+    mode: 0660
+  become: true
+  when: stack_longhorn.enabled
+- name: Copy loki Helm
+  ansible.builtin.template:
+    src: "templates/loki.yml.j2"
+    dest: "{{ manifests_path }}/loki.yml"
+    owner: root
+    group: root
+    mode: 0660
+  become: true
+  when: stack_loki.enabled
