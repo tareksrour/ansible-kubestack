@@ -9,6 +9,11 @@ server:
     annotations:
         nginx.ingress.kubernetes.io/ssl-passthrough: "true"
         nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+{% if stack_argocd.refresh_interval is defined %}
+configs:
+  cm:
+    timeout.reconciliation: {{ stack_argocd.refresh_interval }}
+{% endif %}
 {% if stack_argocd.vault_addr is defined and  stack_argocd.vault_token is defined %}
 repoServer:
   rbac:

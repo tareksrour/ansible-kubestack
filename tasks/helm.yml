@@ -173,22 +173,22 @@
     kubeconfig: "{{ kubeconfig }}"
     values:  "{{ lookup('template', 'argocd_values.yml.j2') | from_yaml }}"
   when: stack_argocd.enabled
-# - name: Add Hashicorp repository
-#   kubernetes.core.helm_repository:
-#     name: hashicorp
-#     repo_url: https://helm.releases.hashicorp.com
-#   when: stack_vault.enabled
-# - name: Deploy Vault
-#   kubernetes.core.helm:
-#     wait: true
-#     name: vault
-#     chart_ref: hashicorp/vault
-#     release_namespace: "{{ stack_vault.namespace }}"
-#     create_namespace: true
-#     kubeconfig: "{{ kubeconfig }}"
-#     values:
-#       global:
-#         externalVaultAddr: "{{ stack_vault.externalVaultAddr if stack_vault.externalVaultAddr else '' }}"
-#     environment:
-#       https_proxy: http://qadevops.internal.sirenanalytics.com:3128
-#   when: stack_vault.enabled
+- name: Add Hashicorp repository
+  kubernetes.core.helm_repository:
+    name: hashicorp
+    repo_url: https://helm.releases.hashicorp.com
+  when: stack_vault.enabled
+- name: Deploy Vault
+  kubernetes.core.helm:
+    wait: true
+    name: vault
+    chart_ref: hashicorp/vault
+    release_namespace: "{{ stack_vault.namespace }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig }}"
+    values:
+      global:
+        externalVaultAddr: "{{ stack_vault.externalVaultAddr if stack_vault.externalVaultAddr else '' }}"
+    environment:
+      https_proxy: http://qadevops.internal.sirenanalytics.com:3128
+  when: stack_vault.enabled

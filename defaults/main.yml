@@ -40,6 +40,7 @@ stack_argocd:
   vault_addr: http://vault.example.com:8200
   vault_token: hvs.token
   ingressClass: nginx
+  refresh_interval: 180s
 stack_vault:
   enabled: true
   namespace: vault
