@@ -3,6 +3,7 @@ controller:
     type: {{ item.service_type }}
     loadBalancerIP: {{ item.loadBalancerIP }}
   ingressClass: {{ item.ingressClass }}
+  allowSnippetAnnotations: {{ item.allowSnippetAnnotations if item.allowSnippetAnnotations is not none else true }}
   ingressClassResource:
     name: {{ item.ingressClass }}
   ingressClassByName: {{ item.ingress_class_by_name if item.ingress_class_by_name is not none else true }}

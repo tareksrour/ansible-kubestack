@@ -68,10 +68,19 @@ stack_argocd:
   vault_addr: http://vault.example.com:8200
   vault_token: hvs.token
   ingressClass: nginx
+  refresh_interval: 180s
 stack_vault:
   enabled: true
   namespace: vault
   externalVaultAddr: http://vault.example.com:8200
+  server:
+    enabled: true
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      host: test.example.com
+  injector:
+    enabled: false
 use_manifests: true
 manifests_path: /var/lib/rancher/rke2/server/manifests
 kubeconfig: ~/.kube/config
@@ -125,6 +134,7 @@ Example playbook to install everything except vault (its already integrated into
           vault_addr: http://vault.example.com:8200
           vault_token: hvs.token
           ingressClass: nginx
+          refresh_interval: 60s
         stack_vault:
           enabled: false
       roles:

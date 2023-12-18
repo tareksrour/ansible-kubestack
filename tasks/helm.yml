@@ -188,7 +188,15 @@
     kubeconfig: "{{ kubeconfig }}"
     values:
       global:
-        externalVaultAddr: "{{ stack_vault.externalVaultAddr if stack_vault.externalVaultAddr else '' }}"
-    environment:
-      https_proxy: http://qadevops.internal.sirenanalytics.com:3128
+        externalVaultAddr: "{{ stack_vault.externalVaultAddr if stack_vault.externalVaultAddr is defined else '' }}"
+      injector:
+        enabled: "{{ stack_vault.injector.enabled if stack_vault.injector.enabled is defined else '-' }}"
+      server:
+        enabled: "{{ stack_vault.server.enabled if stack_vault.server.enabled is defined else '-' }}"
+        ingress:
+          enabled: "{{ stack_vault.server.ingress.enabled if stack_vault.server.ingress.enabled is defined else false }}"
+          ingressClassName: "{{ stack_vault.server.ingress.ingressClassName if stack_vault.server.ingress.ingressClassName is defined else '' }}"
+          hosts:
+          - host: "{{ stack_vault.server.ingress.host if stack_vault.server.ingress.host is defined else 'chart-example.local' }}"
+            path: []
   when: stack_vault.enabled

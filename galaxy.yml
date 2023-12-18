@@ -3,6 +3,6 @@ namespace: tareksrour
 authors:
   - tareksrour
 readme: README.md
-version: 0.0.4
+version: 0.0.7
 license_file: LICENSE
 repository: https://gitlab.com/teeco-DevOps/ansible/kubestack.git
