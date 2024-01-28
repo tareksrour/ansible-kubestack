@@ -160,6 +160,7 @@
   when: stack_argocd.enabled and stack_argocd.vault_addr is defined and  stack_argocd.vault_token is defined
 - name: Create Argocd-Vault Config
   kubernetes.core.k8s:
+    kubeconfig: "{{ kubeconfig }}"
     state: present
     template: 'templates/cmp-plugin.yml.j2'
   when: stack_argocd.enabled and stack_argocd.vault_addr is defined and  stack_argocd.vault_token is defined
