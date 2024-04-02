@@ -1,4 +1,12 @@
 controller:
+{% if item.alternateRegistry is not none %}
+  image:
+    registry: {{ item.alternateRegistry }}
+  admissionWebhooks:
+    patch:
+      image:
+        registry: {{ item.alternateRegistry }}
+{% endif %}
   service:
     type: {{ item.service_type }}
     loadBalancerIP: {{ item.loadBalancerIP }}

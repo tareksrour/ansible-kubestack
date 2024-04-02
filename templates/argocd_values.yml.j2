@@ -16,6 +16,17 @@ configs:
 {% endif %}
 {% if stack_argocd.vault_addr is defined and  stack_argocd.vault_token is defined %}
 repoServer:
+{% if stack_argocd.http_proxy is defined %}
+  env:
+  - name: http_proxy
+    value: {{ stack_argocd.http_proxy }}
+  - name: https_proxy
+    value: {{ stack_argocd.http_proxy }}
+  - name: HTTP_PROXY
+    value: {{ stack_argocd.http_proxy }}
+  - name: HTTPS_PROXY
+    value: {{ stack_argocd.http_proxy }}
+{% endif %}
   rbac:
     - verbs:
         - get
@@ -32,6 +43,16 @@ repoServer:
       env:
         - name: AVP_VERSION
           value: 1.16.1
+{% if stack_argocd.http_proxy is defined %}
+        - name: http_proxy
+          value: {{ stack_argocd.http_proxy }}
+        - name: https_proxy
+          value: {{ stack_argocd.http_proxy }}
+        - name: HTTP_PROXY
+          value: {{ stack_argocd.http_proxy }}
+        - name: HTTPS_PROXY
+          value: {{ stack_argocd.http_proxy }}
+{% endif %}
       command: [sh, -c]
       args:
         - >-

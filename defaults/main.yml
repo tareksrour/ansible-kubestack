@@ -15,6 +15,7 @@ stack_nginx_controllers:
     loadBalancerIP: 127.0.0.1
     ingressClass: nginx
     namespace: ingress-nginx
+    alternateRegistry: harbor.sirenanalytics.com/k8s-cache
 stack_rancher: 
   hostname: rancher.example.com
   bootstrapPassword: admin
@@ -41,6 +42,7 @@ stack_argocd:
   vault_token: hvs.token
   ingressClass: nginx
   refresh_interval: 180s
+  http_proxy: http://localhost:3128
 stack_vault:
   enabled: true
   namespace: vault
