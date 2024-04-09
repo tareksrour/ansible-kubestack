@@ -1,4 +1,8 @@
 server:
+{% if stack_argocd.hosts is defined %}
+  global:
+    domain: {{ stack_argocd.hosts[0] }}
+{% endif %}
   ingress:
     enabled: true
     ingressClassName: "{{ stack_argocd.ingressClass }}"
